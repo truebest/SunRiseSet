@@ -22,6 +22,9 @@
 
 static t_CTime night_end, sun_rise, day_end, sun_set;
 
+static const float gtr = M_PI / 180;   //Градусы в радианы: 10 градусов *П/180градусов
+static const float rtg = 180 / M_PI;   //Радианы в градусы: радианы умножаешь на 180 градусов/П
+
 /**
  * \brief Рассчитывает номер для в году по дате
  * \param day - день
@@ -49,7 +52,6 @@ static uint16_t calcDayOfYear(uint8_t day, uint8_t month, uint16_t year)
  */
 static float calcSunRiseSet(bool is_sun_rise, int day_num, float lat, float lon, int time_offset, int daylight_savings)
 {
-	const float alpha = M_PI / 180;
 	//1. Преобразуем долготу в часы из расчета что земля вращается со скоростью 15 градусов в час
 	const float lng_hour = lon / 15;
 	//2. В зависимости от восхода или заката, что требуется подсчитать
@@ -59,10 +61,10 @@ static float calcSunRiseSet(bool is_sun_rise, int day_num, float lat, float lon,
 	const float m = (0.9856f * t) - 3.289f;
 
 	//4. Рассчитываем истинную долготу Солнца
-	const float l = fmodf(m + (1.916f * sinf(alpha * m)) + (0.020f * sinf(2 * alpha * m)) + 282.634, 360.0f);
+	const float l = fmodf(m + (1.916f * sinf(gtr * m)) + (0.020f * sinf(2 * gtr * m)) + 282.634, 360.0f);
 
 	//5a. Рассчитываем прямое вхождение солнца (https://ru.wikipedia.org/wiki/Прямое_восхождение)
-	float ra = fmodf((180 / M_PI) * atanf(0.91764f * tanf(alpha * l)), 360.0f);
+	float ra = fmodf(rtg * atanf(0.91764f * tanf(gtr * l)), 360.0f);
 
 	//5b. Значение прямого восхождения должно быть в том же квадранте, что и L
 	const float l_quadrant = floorf(l / 90) * 90;
@@ -73,17 +75,17 @@ static float calcSunRiseSet(bool is_sun_rise, int day_num, float lat, float lon,
 	ra = ra / 15;
 
 	//6. Рассчитываем склонение Солнца
-	const float sin_dec = 0.39782f * sinf(alpha * l);
+	const float sin_dec = 0.39782f * sinf(gtr * l);
 	const float cos_dec = cosf(asinf(sin_dec));
 
 	//7a. Рассчитываем местный часовой угол Солнца
-	const float cos_h = (cosf(alpha * ZENITH) - (sin_dec * sinf(alpha * lat))) / (cos_dec * cosf(alpha * lat));
+	const float cos_h = (cosf(gtr * ZENITH) - (sin_dec * sinf(gtr * lat))) / (cos_dec * cosf(gtr * lat));
 	if (cos_h > 1) return ERROR_VAL;
 	if (cos_h < -1) return -ERROR_VAL;
 	
 
 	//7b. Закончить расчет H и перевести в часы
-	float h = is_sun_rise ? 360 - (180 / M_PI) * acosf(cos_h) : (180 / M_PI) * acosf(cos_h);
+	float h = is_sun_rise ? 360 - rtg * acosf(cos_h) : rtg * acosf(cos_h);
 	h = h / 15;
 
 	//8. Рассчитать местное среднее время восхода / заката
@@ -106,8 +108,8 @@ static float calcSunRiseSet(bool is_sun_rise, int day_num, float lat, float lon,
 bool SunRS_CalcValues(t_CTime cur_time, float lat, float lon, int time_offset, int daylight_savings)
 {
 	float sh;
-	uint32_t total_night = 0;
-	uint32_t total_day = 0;
+	uint32_t total_night;
+	uint32_t total_day;
 	const int day_of_year = calcDayOfYear(cur_time.date, cur_time.month, cur_time.year);
 	if ((day_of_year > 0) && (day_of_year < 366))
 	{
@@ -169,22 +171,38 @@ bool SunRS_CalcValues(t_CTime cur_time, float lat, float lon, int time_offset, i
 }
 
 
+/**
+ * \brief Возвращает время и дату начала дня (восхода солнца)
+ * \return структура времени
+ */
 t_CTime SunRS_GetDayStart(void)
 {
 	return sun_rise;
 }
 
+/**
+ * \brief brief Возвращает время и дату конца дня(заката солнца)
+ * \return структура времени
+ */
 t_CTime SunRS_GetDayEnd(void)
 {
 	return day_end;
 }
 
 
+/**
+ * \brief brief Возвращает время и дату начала ночи(заката солнца)
+ * \return структура времени
+ */
 t_CTime SunRS_GetNightStart(void)
 {
 	return sun_set;
 }
 
+/**
+ * \brief brief Возвращает время и дату конца ночи(восхода солнца)
+ * \return структура времени
+ */
 t_CTime SunRS_GetNightEnd(void)
 {
 	return night_end;
