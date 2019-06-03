@@ -1,4 +1,4 @@
-#ifndef _SUNRISESET_H_
+﻿#ifndef _SUNRISESET_H_
 #define _SUNRISESET_H_
 
 bool SunRS_CalcValues(t_CTime cur_time, float lat, float lon, int time_offset, int daylight_savings);
