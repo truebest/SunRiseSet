@@ -113,7 +113,7 @@ bool SunRS_CalcValues(t_CTime cur_time, float lat, float lon, int time_offset, i
 	{
 		const float rt = calcSunRiseSet(CALC_SUN_RISE, day_of_year, lat, lon, time_offset, daylight_savings);
 		sh = fmodf(DAY_HOURS + rt, DAY_HOURS);
-		float sm = modf(fmodf(DAY_HOURS + rt, DAY_HOURS), &sh) * 60;
+		float sm = modff(fmodf(DAY_HOURS + rt, DAY_HOURS), &sh) * 60;
 
 		sun_rise = cur_time;
 		sun_rise.hours = roundf(sh);
@@ -122,7 +122,7 @@ bool SunRS_CalcValues(t_CTime cur_time, float lat, float lon, int time_offset, i
 
 		const float st = calcSunRiseSet(CALC_SUN_SET, day_of_year, lat, lon, time_offset, daylight_savings);
 		sh = fmodf(DAY_HOURS + st, DAY_HOURS);
-		sm = modf(fmodf(DAY_HOURS + st, DAY_HOURS), &sh) * 60;
+		sm = modff(fmodf(DAY_HOURS + st, DAY_HOURS), &sh) * 60;
 
 		sun_set = cur_time;
 		sun_set.hours = roundf(sh);
