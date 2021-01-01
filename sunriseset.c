@@ -11,9 +11,10 @@
 
 
 
-#define ZENITH		(90.8f)
-#define DAY_HOURS	 24.0f
-#define ERROR_VAL	 100
+#define ZENITH		 (93.0f)
+#define DAY_HOURS	 (24.0f)
+#define ERROR_VAL	 (100)
+#define M_PI         (3.1415926535897f)
 
 #define CALC_SUN_RISE		true
 #define CALC_SUN_SET		false
@@ -28,6 +29,10 @@ static const float rtg = 180 / M_PI;   //Радианы в градусы: ра�
 
 /**
  * \brief Рассчитывает номер для в году по дате
+ * Как это работает...
+ * n1 приблизительно определяет максимальный номер дня текущего месяца
+ * n2 будер равно нулю, если месяц меньше 3, и будет 1, если он больше. Эта формула позволяет определить был ли февраль
+ * n3 будет равно 2, если год не високосный, и будет равен 1, если это високосный год. Математика здесь просто для того, чтобы определить, является ли текущий год високосным.
  * \param day - день
  * \param month - месяц
  * \param year - год
@@ -112,7 +117,7 @@ bool SunRS_CalcValues(t_CTime cur_time, float lat, float lon, int time_offset, i
     uint32_t total_night;
     uint32_t total_day;
     int day_of_year = calcDayOfYear(cur_time.date, cur_time.month, cur_time.year);
-    if ((day_of_year > 0) && (day_of_year < 366))
+    if ((day_of_year > 0) && (day_of_year <= 366))
     {
         const float rt = calcSunRiseSet(CALC_SUN_RISE, day_of_year, lat, lon, time_offset, daylight_savings);
         sh = fmodf(DAY_HOURS + rt, DAY_HOURS);

@@ -75,7 +75,7 @@ uint32_t rtcToEpoch(t_CTime *c_time)
 
 
 /*
-* Р”РѕР±Р°РІР»СЏРµС‚ СЃРµРєСѓРЅРґС‹ Рє РІСЂРµРјРµРЅРё
+* Добавляет секунды к структуре C_TIme
 */
 t_CTime addSecToCTime(t_CTime *c_time, const uint32_t sec)
 {

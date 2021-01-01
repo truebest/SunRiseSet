@@ -5,15 +5,15 @@
 #include "typedef.h"
 #include "sunriseset.h"
 
-#define LATITUDE   (59.9342802f)
-#define LONGITUDE  (30.3350986f)
+#define LATITUDE   (53.183968f)
+#define LONGITUDE  (43.981667f)
 
 int main() {
     t_CTime current_time, tmp_time;
     current_time.dworld = 0;
-    current_time.date = 28;
+    current_time.date = 1;
     current_time.month = 2;
-    current_time.year = 19;
+    current_time.year = 21;
 
 
     SunRS_CalcValues(current_time, LATITUDE, LONGITUDE, 3, 0);
